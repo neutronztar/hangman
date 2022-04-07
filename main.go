@@ -7,43 +7,50 @@ import (
 	"strings"
 )
 
-var guessedLetters string
-var limbs int = 7
-var secretPhrase string
+type gameState struct {
+	guessedLetters string
+	limbs          int
+	secretPhrase   string
+}
 
 func main() {
 	draw.DrawBlankLines(200)
 	fmt.Println("---HANGMAN---")
-	secretPhrase = input.InputSecretPhrase()
+
+	state := gameState{
+		guessedLetters: "",
+		limbs:          7,
+		secretPhrase:   input.InputSecretPhrase(),
+	}
 
 	// Main Loop
 	for {
-		drawGame()
+		drawGame(state)
 
 		// User guesses letter
-		guess := input.InputLetter(guessedLetters)
-		guessedLetters = guessedLetters + guess
+		guess := input.InputLetter(state.guessedLetters)
+		state.guessedLetters = state.guessedLetters + guess
 
 		// Lose a limb if your letter isn't in the phrase
-		if !strings.Contains(secretPhrase, guess) {
-			limbs -= 1
+		if !strings.Contains(state.secretPhrase, guess) {
+			state.limbs -= 1
 		}
 
 		// Win/lose checks
-		if limbs == 0 {
-			gameOver()
+		if state.limbs == 0 {
+			gameOver(state)
 			return
 		}
-		if checkForWin() {
-			gameWon()
+		if checkForWin(state) {
+			gameWon(state)
 			return
 		}
 	}
 }
 
-func checkForWin() bool {
-	for _, v := range secretPhrase {
-		if !strings.Contains(guessedLetters+" ", string(v)) {
+func checkForWin(state gameState) bool {
+	for _, v := range state.secretPhrase {
+		if !strings.Contains(state.guessedLetters+" ", string(v)) {
 			// Didn't win yet
 			return false
 		}
@@ -52,28 +59,30 @@ func checkForWin() bool {
 	return true
 }
 
-func drawGame() {
+func drawGame(state gameState) {
 	draw.DrawBlankLines(100)
-	draw.DrawMan(limbs)
+	draw.DrawMan(state.limbs)
 	fmt.Println()
-	draw.DrawSecretPhrase(secretPhrase, guessedLetters)
+	draw.DrawSecretPhrase(state.secretPhrase, state.guessedLetters)
 	fmt.Println()
-	fmt.Println("Guessed Letters:", guessedLetters)
+	if state.guessedLetters != "" {
+		fmt.Println("Guessed Letters:", state.guessedLetters)
+	}
 }
 
-func gameOver() {
+func gameOver(state gameState) {
 	draw.DrawBlankLines(100)
-	draw.DrawMan(limbs)
+	draw.DrawMan(state.limbs)
 	fmt.Println()
-	guessedLetters = "abcdefghijklmnopqrstuvwxyz"
-	draw.DrawSecretPhrase(secretPhrase, guessedLetters)
+	state.guessedLetters = "abcdefghijklmnopqrstuvwxyz"
+	draw.DrawSecretPhrase(state.secretPhrase, state.guessedLetters)
 	fmt.Println("\nGAME OVER")
 }
 
-func gameWon() {
+func gameWon(state gameState) {
 	draw.DrawBlankLines(100)
-	draw.DrawMan(limbs)
+	draw.DrawMan(state.limbs)
 	fmt.Println()
-	draw.DrawSecretPhrase(secretPhrase, guessedLetters)
+	draw.DrawSecretPhrase(state.secretPhrase, state.guessedLetters)
 	fmt.Println("\nYOU WIN")
 }

@@ -21,7 +21,8 @@ func InputSecretPhrase() string {
 		userInput, _ := in.ReadString('\n')
 
 		// Get rid of carriage return at the end
-		userInput = strings.Replace(userInput, "\r\n", "", -1)
+		userInput = strings.Replace(userInput, "\r\n", "", -1) // Windows
+		userInput = strings.Replace(userInput, "\n", "", -1)   // Linux
 
 		// Make sure input is valid
 		err := ValidatePhrase(userInput)
@@ -65,7 +66,8 @@ func InputLetter(guessedLetters string) string {
 		userInput, _ := in.ReadString('\n')
 
 		// Get rid of carriage return at the end and make it lowercase
-		userInput = strings.Replace(userInput, "\r\n", "", -1)
+		userInput = strings.Replace(userInput, "\r\n", "", -1) // Windows
+		userInput = strings.Replace(userInput, "\n", "", -1)   // Linux
 		userInput = strings.ToLower(userInput)
 
 		// Make sure input is valid
